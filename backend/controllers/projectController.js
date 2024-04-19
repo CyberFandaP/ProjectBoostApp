@@ -76,13 +76,88 @@ const deleteProject = async (req, res) => {
     }
 };
 
-// Additional task-specific controller methods can be defined here...
+// Get all tasks for a specific project
+const getAllTasks = async (req, res) => {
+    const { projectId } = req.params;
+    try {
+        const tasks = await Task.find({ projectId }).sort({ createdAt: -1 });
+        res.status(200).json(tasks);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
 
-// Export controller functions
+// Get a single task
+const getTask = async (req, res) => {
+    const { taskId } = req.params;
+    try {
+        const task = await Task.findById(taskId);
+        if (!task) {
+            return res.status(404).json({ error: "No such task" });
+        }
+        res.status(200).json(task);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+// Create a new task within a project
+const createTask = async (req, res) => {
+    const { projectId } = req.params;
+    const { text, state } = req.body;
+
+    try {
+        const task = await Task.create({
+            text,
+            state,
+            projectId
+        });
+        res.status(201).json(task);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+};
+
+// Update an existing task
+const updateTask = async (req, res) => {
+    const { taskId } = req.params;
+    const updateData = req.body;
+
+    try {
+        const task = await Task.findByIdAndUpdate(taskId, updateData, { new: true });
+        if (!task) {
+            return res.status(404).json({ error: "No such task" });
+        }
+        res.status(200).json(task);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+};
+
+// Delete a task
+const deleteTask = async (req, res) => {
+    const { taskId } = req.params;
+    try {
+        const task = await Task.findByIdAndDelete(taskId);
+        if (!task) {
+            return res.status(404).json({ error: "No such task" });
+        }
+        res.status(200).json({ message: "Task deleted successfully" });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+// Export controller functions including the new task-specific functions
 module.exports = {
     getAllProjects,
     getProject,
     createProject,
     updateProject,
-    deleteProject
+    deleteProject,
+    getAllTasks,
+    getTask,
+    createTask,
+    updateTask,
+    deleteTask
 };
