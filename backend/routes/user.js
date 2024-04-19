@@ -1,20 +1,12 @@
-// Import Express to create the router
 const express = require("express");
+const { signupUser, loginUser } = require("../controllers/userController");
 
-// Create a new router object
 const router = express.Router();
 
-//-----------Login route-----------//
-// POST: /login
-router.post("/login", (req, res) => {
-    res.json({ message: "Login request received" });
-});
+// Login route
+router.post("/login", loginUser);
 
-//------------Signup route-----------//
-// POST: /signup
-router.post("/signup", (req, res) => {
-    res.json({ message: "Signup request received" });
-});
+// Signup route
+router.post("/signup", signupUser);
 
-// Export the router to use in the main app
 module.exports = router;
