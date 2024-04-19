@@ -1,15 +1,12 @@
 const Project = require("../models/projectModel");
 const Task = require("../models/taskModel");
-const mongoose = require("mongoose");
 
 // Retrieves all projects created by the logged-in user along with their associated tasks
 const getAllProjects = async (req, res) => {
     try {
-        // Attempt to find all projects by the user's ID and populate the 'tasks' field
         const projects = await Project.find({ userId: req.user._id }).populate('tasks');
         res.status(200).json(projects);
     } catch (error) {
-        // Log the error and send a server error response
         console.error("Failed to retrieve projects:", error);
         res.status(500).json({ error: error.message });
     }
@@ -35,10 +32,13 @@ const createProject = async (req, res) => {
     const { name, tasksTimer, tasksNumber } = req.body;
     try {
         const project = await Project.create({ name, tasksTimer, tasksNumber, userId: req.user._id });
+        let tasks = [];
         if (tasksNumber > 0) {
-            const tasks = Array.from({ length: tasksNumber }, () => ({ text: "", projectId: project._id }));
-            await Task.insertMany(tasks);
+            tasks = Array.from({ length: tasksNumber }, () => ({ text: "", projectId: project._id }));
+            tasks = await Task.insertMany(tasks);
         }
+        project.tasks = tasks.map(task => task._id);
+        await project.save();
         res.status(201).json(project);
     } catch (error) {
         console.error("Failed to create project:", error);
@@ -71,7 +71,7 @@ const deleteProject = async (req, res) => {
             return res.status(404).json({ error: "No such project" });
         }
         await Task.deleteMany({ projectId: project._id });
-        res.status(200).json(project);
+        res.status(200).json({ message: "Project and associated tasks deleted successfully" });
     } catch (error) {
         console.error("Failed to delete project:", projectId, error);
         res.status(500).json({ error: error.message });
@@ -130,7 +130,7 @@ const updateTask = async (req, res) => {
         res.status(200).json(task);
     } catch (error) {
         console.error("Failed to update task:", taskId, error);
-        res.status(400).json({ error: error.message });
+        res.status (400).json({ error: error.message });
     }
 };
 
@@ -149,7 +149,6 @@ const deleteTask = async (req, res) => {
     }
 };
 
-// Export controller functions including the new task-specific functions
 module.exports = {
     getAllProjects,
     getProject,
