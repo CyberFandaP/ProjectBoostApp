@@ -9,7 +9,7 @@ const taskSchema = new Schema({
     // Task description text
     text: {
         type: String,
-        required: true
+        required: false
     },
     // Task state with predefined values
     state: {
