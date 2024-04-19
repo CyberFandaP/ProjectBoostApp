@@ -1,23 +1,20 @@
 import React, { useState } from "react";
-import { useAuthContext } from "../hooks/useAuthContext";
+// Import the useLogin hook from your hooks directory
+import { useLogin } from "../hooks/useLogin";
 
 const Login = () => {
-    // Stavové proměnné pro uchování hodnot z formuláře
+    // State variables for holding form input values
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    // Získání kontextu autentizace pro použití dispečera
-    const { dispatch } = useAuthContext();
+    // Destructuring functions and state from the useLogin hook
+    const { login, error, isLoading } = useLogin();
 
-    // Funkce pro odeslání formuláře
+    // Function to handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        // Zde bys volal API pro přihlášení uživatele
-        console.log(email, password);
-
-        // Příklad jak použít dispečer pro aktualizaci stavu autentizace
-        // dispatch({ type: "LOGIN", payload: { email } });
+        // Call the login function provided by the useLogin hook
+        await login(email, password);
     };
 
     return (
@@ -29,6 +26,7 @@ const Login = () => {
                 type="email" 
                 onChange={(e) => setEmail(e.target.value)}
                 value={email}
+                required
             />
 
             <label>Password:</label>
@@ -36,9 +34,15 @@ const Login = () => {
                 type="password" 
                 onChange={(e) => setPassword(e.target.value)}
                 value={password}
+                required
             />  
 
-            <button>Log In</button>
+            <button type="submit" disabled={isLoading}>
+                {isLoading ? 'Logging In...' : 'Log In'}
+            </button>
+
+            {/* Display any error messages */}
+            {error && <div className="error">{error}</div>}
         </form>
     );
 };

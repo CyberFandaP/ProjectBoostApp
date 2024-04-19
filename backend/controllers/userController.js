@@ -18,8 +18,8 @@ const loginUser = async (req, res) => {
         const user = await User.login(email, password);
         // Generate a JWT for the authenticated user
         const token = createToken(user._id);
-        // Send successful response back with user email and token
-        res.status(200).json({ email: user.email, token });
+        // Send successful response back with user email, username, and token
+        res.status(200).json({ email: user.email, username: user.username, token });
     } catch (error) {
         // If authentication fails, send a 400 bad request response with the error message
         console.error("Login failed:", error);
