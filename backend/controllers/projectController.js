@@ -2,17 +2,20 @@ const Project = require("../models/projectModel");
 const Task = require("../models/taskModel");
 const mongoose = require("mongoose");
 
-// Get all projects and their associated tasks
+// Retrieves all projects created by the logged-in user along with their associated tasks
 const getAllProjects = async (req, res) => {
     try {
+        // Attempt to find all projects by the user's ID and populate the 'tasks' field
         const projects = await Project.find({ userId: req.user._id }).populate('tasks');
         res.status(200).json(projects);
     } catch (error) {
+        // Log the error and send a server error response
+        console.error("Failed to retrieve projects:", error);
         res.status(500).json({ error: error.message });
     }
 };
 
-// Get a single project and its tasks
+// Retrieves a single project by its ID along with all associated tasks
 const getProject = async (req, res) => {
     const { projectId } = req.params;
     try {
@@ -22,34 +25,31 @@ const getProject = async (req, res) => {
         }
         res.status(200).json(project);
     } catch (error) {
+        console.error("Error fetching project with ID:", projectId, error);
         res.status(500).json({ error: error.message });
     }
 };
 
-// Create a new project and potentially initial tasks
+// Creates a new project and optionally a specified number of tasks with empty content
 const createProject = async (req, res) => {
     const { name, tasksTimer, tasksNumber } = req.body;
     try {
         const project = await Project.create({ name, tasksTimer, tasksNumber, userId: req.user._id });
-        // Optional: Create initial tasks if tasksNumber is specified
         if (tasksNumber > 0) {
-            // Create tasks with empty text
-            const tasks = Array.from({ length: tasksNumber }, () => ({
-                text: "", // Initially, the text will be empty
-                projectId: project._id
-            }));
+            const tasks = Array.from({ length: tasksNumber }, () => ({ text: "", projectId: project._id }));
             await Task.insertMany(tasks);
         }
         res.status(201).json(project);
     } catch (error) {
+        console.error("Failed to create project:", error);
         res.status(400).json({ error: error.message });
     }
 };
 
-// Update a project
+// Updates a project's name and task timer based on provided values
 const updateProject = async (req, res) => {
     const { projectId } = req.params;
-    const { name, tasksTimer } = req.body; // Example fields that might be updated
+    const { name, tasksTimer } = req.body;
     try {
         const project = await Project.findByIdAndUpdate(projectId, { name, tasksTimer }, { new: true });
         if (!project) {
@@ -57,11 +57,12 @@ const updateProject = async (req, res) => {
         }
         res.status(200).json(project);
     } catch (error) {
+        console.error("Failed to update project:", projectId, error);
         res.status(400).json({ error: error.message });
     }
 };
 
-// Delete a project
+// Deletes a project and all its associated tasks
 const deleteProject = async (req, res) => {
     const { projectId } = req.params;
     try {
@@ -69,25 +70,27 @@ const deleteProject = async (req, res) => {
         if (!project) {
             return res.status(404).json({ error: "No such project" });
         }
-        await Task.deleteMany({ projectId: project._id }); // Delete associated tasks
+        await Task.deleteMany({ projectId: project._id });
         res.status(200).json(project);
     } catch (error) {
+        console.error("Failed to delete project:", projectId, error);
         res.status(500).json({ error: error.message });
     }
 };
 
-// Get all tasks for a specific project
+// Retrieves all tasks associated with a specific project
 const getAllTasks = async (req, res) => {
     const { projectId } = req.params;
     try {
         const tasks = await Task.find({ projectId }).sort({ createdAt: -1 });
         res.status(200).json(tasks);
     } catch (error) {
+        console.error("Failed to retrieve tasks for project:", projectId, error);
         res.status(500).json({ error: error.message });
     }
 };
 
-// Get a single task
+// Retrieves a specific task by its ID
 const getTask = async (req, res) => {
     const { taskId } = req.params;
     try {
@@ -97,32 +100,28 @@ const getTask = async (req, res) => {
         }
         res.status(200).json(task);
     } catch (error) {
+        console.error("Failed to retrieve task:", taskId, error);
         res.status(500).json({ error: error.message });
     }
 };
 
-// Create a new task within a project
+// Creates a new task within a project with provided text and state
 const createTask = async (req, res) => {
     const { projectId } = req.params;
     const { text, state } = req.body;
-
     try {
-        const task = await Task.create({
-            text,
-            state,
-            projectId
-        });
+        const task = await Task.create({ text, state, projectId });
         res.status(201).json(task);
     } catch (error) {
+        console.error("Failed to create task in project:", projectId, error);
         res.status(400).json({ error: error.message });
     }
 };
 
-// Update an existing task
+// Updates an existing task with provided data
 const updateTask = async (req, res) => {
     const { taskId } = req.params;
     const updateData = req.body;
-
     try {
         const task = await Task.findByIdAndUpdate(taskId, updateData, { new: true });
         if (!task) {
@@ -130,11 +129,12 @@ const updateTask = async (req, res) => {
         }
         res.status(200).json(task);
     } catch (error) {
+        console.error("Failed to update task:", taskId, error);
         res.status(400).json({ error: error.message });
     }
 };
 
-// Delete a task
+// Deletes a specific task
 const deleteTask = async (req, res) => {
     const { taskId } = req.params;
     try {
@@ -144,6 +144,7 @@ const deleteTask = async (req, res) => {
         }
         res.status(200).json({ message: "Task deleted successfully" });
     } catch (error) {
+        console.error("Failed to delete task:", taskId, error);
         res.status(500).json({ error: error.message });
     }
 };
