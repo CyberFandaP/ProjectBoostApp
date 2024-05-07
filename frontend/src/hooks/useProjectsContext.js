@@ -1,13 +1,12 @@
-import { ProjectsContext } from "../context/ProjectsContext"
-import { useContext } from "react"
+import { useContext } from "react";
+import { ProjectsContext } from "../context/ProjectsContext";
 
 export const useProjectsContext = () => {
-    const context = useContext(ProjectsContext)
+    const context = useContext(ProjectsContext);
 
-    // This check ensures that the hook is used within a component wrapped by the ProjectsContextProvider
     if (!context) {
-        throw Error("useProjectsContext must be used inside ProjectsContextProvider")
+        throw new Error("useProjectsContext must be used within a ProjectsContextProvider");
     }
 
-    return context
+    return context;
 }

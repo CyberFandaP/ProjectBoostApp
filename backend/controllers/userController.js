@@ -3,13 +3,21 @@ const User = require("../models/userModel");
 // Import JWT for token generation to secure the authentication process
 const jwt = require("jsonwebtoken");
 
-// Helper function to generate a JWT token
-// This function signs a JWT with the user's database ID and sets an expiration of 3 days
+/**
+ * Helper function to generate a JWT token.
+ * This function signs a JWT with the user's database ID and sets an expiration of 3 days.
+ * @param {string} _id - The MongoDB ObjectId of a user.
+ * @returns {string} A JWT signed with the user's ID.
+ */
 const createToken = (_id) => {
     return jwt.sign({ _id }, process.env.SECRET, { expiresIn: '3d' });
 }
 
-// Controller function for user login
+/**
+ * Controller function for user login.
+ * @param {object} req - The request object containing the user's credentials.
+ * @param {object} res - The response object used to send back the HTTP response.
+ */
 const loginUser = async (req, res) => {
     const { email, password } = req.body;  // Extract email and password from request body
 
@@ -27,7 +35,11 @@ const loginUser = async (req, res) => {
     }
 }
 
-// Controller function for user signup
+/**
+ * Controller function for user signup.
+ * @param {object} req - The request object containing the new user's details.
+ * @param {object} res - The response object used to send back the HTTP response.
+ */
 const signupUser = async (req, res) => {
     const { email, username, password } = req.body; // Extract email, username, and password from request body
     console.log("Attempting to sign up with:", email, username);

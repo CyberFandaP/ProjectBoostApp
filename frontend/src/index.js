@@ -1,9 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
+import './index.css'; // Zde ujistěte se, že váš vlastní CSS není v konfliktu s Tailwindem
 import App from './App';
 import { AuthContextProvider } from './context/AuthContext';
-import { ProjectsContextProvider } from './context/ProjectsContext'; // Import the ProjectsContextProvider
+import { ProjectsContextProvider } from './context/ProjectsContext';
+import 'tailwindcss/tailwind.css'; // Přidejte tento import pro Tailwind CSS
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

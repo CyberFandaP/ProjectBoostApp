@@ -40,6 +40,7 @@ export const useSignup = () => {
                 // Dispatch LOGIN action to update auth context state
                 dispatch({type: "LOGIN", payload: json});
                 setIsLoading(false); // End loading state
+                return true;
             }
         } catch (err) {
             // Handle errors like network issues
